@@ -28,7 +28,7 @@ mongoose.connect(URL, {
 
 app.get('/', (req, res) => {
   res.send("Hello ");
-})
+});
 
 app.post('/api/createlink', async(req, res) => {
   try {
@@ -80,7 +80,7 @@ app.post('/api/createlink', async(req, res) => {
     console.log(error);
     res.status(500).json(error);
   }
-})
+});
 
 app.get('/api/:sourceId', async(req, res) => {
 
@@ -101,8 +101,8 @@ app.get('/api/:sourceId', async(req, res) => {
     res.status(500).json(error);
   }
 
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Listening to port ${PORT}`);
-})
+});
