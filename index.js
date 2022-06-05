@@ -82,7 +82,7 @@ app.post('/api/createlink', async(req, res) => {
   }
 });
 
-app.get('/api/:sourceId', async(req, res) => {
+app.get('/:sourceId', async(req, res) => {
 
   const { sourceId } = req.params;
   try {
