@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 dotenv.config();
 
 const PORT = process.env.PORT || 8000;
-
+const API_KEY = process.env.API_KEY;
 const URL = process.env.MONGODB_URL;
 mongoose.connect(URL, {
   useNewUrlParser: true,
@@ -32,48 +32,53 @@ app.get('/', (req, res) => {
 
 app.post('/api/createlink', async(req, res) => {
   try {
-    const { sourceId, destinationURL } = req.body;
-    const link = await RedirectLink.find({sourceId});
-    // console.log(link.length);
-    if(link.length)
-      res.status(409).json({error: "sourceId conflict"});
-    else {
-      console.log(destinationURL)
+    const { sourceId, destinationURL, apiKey } = req.body;
+    if(apiKey===API_KEY) {
+      const link = await RedirectLink.find({sourceId});
+      // console.log(link.length);
+      if(link.length)
+        res.status(409).json({error: "sourceId conflict"});
+      else {
+        console.log(destinationURL)
 
-      
-      const validateDestinationURL = validator.isURL(destinationURL, {
-        protocols: ['http','https','ftp'], 
-        require_tld: true, 
-        require_protocol: true, 
-        require_host: true, 
-        require_port: false, 
-        require_valid_protocol: true, 
-        allow_underscores: false, 
-        host_whitelist: false, 
-        host_blacklist: false, 
-        allow_trailing_dot: false, 
-        allow_protocol_relative_urls: false, 
-        allow_fragments: true, 
-        allow_query_components: true, 
-        disallow_auth: false, 
-        validate_length: true
-      })
-
-      if(validateDestinationURL && sourceId!=='') {
-        const newLink = new RedirectLink({
-          sourceId,
-          destinationURL
+        
+        const validateDestinationURL = validator.isURL(destinationURL, {
+          protocols: ['http','https','ftp'], 
+          require_tld: true, 
+          require_protocol: true, 
+          require_host: true, 
+          require_port: false, 
+          require_valid_protocol: true, 
+          allow_underscores: false, 
+          host_whitelist: false, 
+          host_blacklist: false, 
+          allow_trailing_dot: false, 
+          allow_protocol_relative_urls: false, 
+          allow_fragments: true, 
+          allow_query_components: true, 
+          disallow_auth: false, 
+          validate_length: true
         })
 
-        const newRedirectLink = await newLink.save();
+        if(validateDestinationURL && sourceId!=='') {
+          const newLink = new RedirectLink({
+            sourceId,
+            destinationURL
+          })
 
-        console.log(newRedirectLink);
+          const newRedirectLink = await newLink.save();
 
-        res.status(200).json(newRedirectLink);
+          console.log(newRedirectLink);
+
+          res.status(200).json(newRedirectLink);
+        }
+        else {
+          res.status(400).json({error: "Invalid input"});
+        }
       }
-      else {
-        res.status(400).json({error: "Invalid input"});
-      }
+    }
+    else {
+      res.status(400).json({error: "Invald api key"});
     }
     
   } catch(error) {
