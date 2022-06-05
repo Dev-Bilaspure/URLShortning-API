@@ -3,11 +3,13 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const helmet = require("helmet");
 const RedirectLink = require("./models/RedirectLink");
 const validator = require("validator");
 const morgan = require("morgan");
 const app = express();
 
+app.use(helmet());
 app.use(cors());
 app.use(morgan("common"));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -37,7 +39,7 @@ app.post('/api/createlink', async(req, res) => {
       const link = await RedirectLink.find({sourceId});
       // console.log(link.length);
       if(link.length)
-        res.status(409).json({error: "sourceId conflict"});
+        res.status(409).json({error: "sourceId conflict", helperErrorCode: 101});
       else {
         console.log(destinationURL)
 
@@ -73,12 +75,12 @@ app.post('/api/createlink', async(req, res) => {
           res.status(200).json(newRedirectLink);
         }
         else {
-          res.status(400).json({error: "Invalid input"});
+          res.status(400).json({error: "Invalid input", helperErrorCode: 102});
         }
       }
     }
     else {
-      res.status(400).json({error: "Invald api key"});
+      res.status(400).json({error: "Invald api key", helperErrorCode: 103});
     }
     
   } catch(error) {
